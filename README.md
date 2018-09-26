@@ -3,7 +3,7 @@
 [![PyPI version](https://badge.fury.io/py/tap-mysql.svg)](https://badge.fury.io/py/tap-mysql)
 [![CircleCI Build Status](https://circleci.com/gh/singer-io/tap-mysql.png)](https://circleci.com/gh/singer-io/tap-mysql)
 
-[Singer](https://www.singer.io/) tap that extracts data from a [MySQL](https://www.mysql.com/) database and produces JSON-formatted data following the [Singer spec](https://github.com/singer-io/getting-started/blob/master/SPEC.md).
+[Singer](https://www.singer.io/) tap that extracts data from a [MySQL](https://www.mysql.com/) database and produces JSON-formatted data following the [Singer spec](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md).
 
 ```bash
 $ mkvirtualenv -p python3 tap-mysql
@@ -104,10 +104,7 @@ source table directly corresponds to a Singer stream.
       "key_properties": [
         "id"
       ],
-      "database_name": "example_db",
-      "is_view": false,
       "tap_stream_id": "example_db-animals",
-      "row_count": 3,
       "schema": {
         "properties": {
           "likes_getting_petted": {
@@ -151,7 +148,10 @@ source table directly corresponds to a Singer stream.
         },
         {
           "metadata": {
-            "selected-by-default": false
+            "database-name": "example_db",
+            "selected-by-default": false,
+            "is-view": false,
+            "row-count": 3
           },
           "breadcrumb": []
         },
@@ -298,10 +298,7 @@ properties file:
       "key_properties": [
         "id"
       ],
-      "database_name": "example_db",
-      "is_view": false,
       "tap_stream_id": "example_db-animals",
-      "row_count": 3,
       "schema": {
         "selected": "true",
         "properties": {
