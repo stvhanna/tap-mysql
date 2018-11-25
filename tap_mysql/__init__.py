@@ -385,7 +385,7 @@ def resolve_catalog(discovered_catalog, streams_to_sync):
             continue
 
         selected = {k for k, v in catalog_entry.schema.properties.items()
-                        if common.property_is_selected(catalog_entry, k) or k == replication_key}
+                    if common.property_is_selected(catalog_entry, k) or k == replication_key}
 
         # These are the columns we need to select
         columns = desired_columns(selected, discovered_table.schema)
@@ -674,8 +674,8 @@ def do_sync(mysql_conn, config, catalog, state):
 
 def log_server_params(mysql_conn):
     with connect_with_backoff(mysql_conn) as open_conn:
-        with open_conn.cursor() as cur:
-            try:
+        try:
+            with open_conn.cursor() as cur:
                 cur.execute('''
                 SELECT VERSION() as version,
                        @@session.wait_timeout as wait_timeout,
@@ -690,8 +690,19 @@ def log_server_params(mysql_conn):
                             'max_allowed_packet: %s, ' +
                             'interactive_timeout: %s',
                             *row)
-            except pymysql.err.InternalError as e:
-                LOGGER.warning("Encountered error checking server params. Error: (%s) %s", *e.args)
+            with open_conn.cursor() as cur:
+                cur.execute('''
+                show session status where Variable_name IN ('Ssl_version', 'Ssl_cipher')''')
+                rows = cur.fetchall()
+                mapped_row = {k:v for (k,v) in [(r[0], r[1]) for r in rows]}
+                LOGGER.info('Server SSL Parameters (blank means SSL is not active): ' +
+                            '[ssl_version: %s], ' +
+                            '[ssl_cipher: %s]',
+                            mapped_row['Ssl_version'],
+                            mapped_row['Ssl_cipher'])
+
+        except pymysql.err.InternalError as e:
+            LOGGER.warning("Encountered error checking server params. Error: (%s) %s", *e.args)
 
 
 def main_impl():
